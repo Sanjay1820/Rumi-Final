@@ -13,6 +13,7 @@ import { AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { z } from "zod";
 import { api } from "@/lib/api";
+import emailjs from "@emailjs/browser";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
@@ -109,6 +110,7 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
+      // 1. Send via API (if connected to real backend)
       const res = await api.inquiries.create({
         name: formData.name,
         email: formData.email,
@@ -119,6 +121,84 @@ const Contact = () => {
         preferred_date: formData.preferredDate,
         preferred_time: formData.preferredTime
       });
+
+      // 2. Send via EmailJS to admin Inbox
+      try {
+        const themeColor = "#C6A75E";
+        const bgColor = "#FAF9F7";
+
+        const htmlMessage = `
+          <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; background-color: ${bgColor}; border: 1px solid #eee; border-radius: 8px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h1 style="color: ${themeColor}; margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 2px;">New Contact Request</h1>
+              <p style="color: #666; font-size: 14px; margin-top: 5px;">You have received a new contact submission from your website.</p>
+            </div>
+            
+            <div style="background-color: #fff; padding: 20px; border-radius: 6px; margin-bottom: 20px;">
+              <h2 style="color: #333; font-size: 16px; border-bottom: 1px solid #eaeaea; padding-bottom: 10px; margin-top: 0;">Customer Details</h2>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px 0; color: #666; width: 120px;"><strong>Name:</strong></td><td style="padding: 8px 0; color: #333;">${formData.name}</td></tr>
+                <tr><td style="padding: 8px 0; color: #666;"><strong>Email:</strong></td><td style="padding: 8px 0; color: #333;"><a href="mailto:${formData.email}" style="color: ${themeColor};">${formData.email}</a></td></tr>
+                <tr><td style="padding: 8px 0; color: #666;"><strong>Phone:</strong></td><td style="padding: 8px 0; color: #333;"><a href="tel:${formData.phone}" style="color: ${themeColor};">${formData.phone}</a></td></tr>
+              </table>
+            </div>
+
+            <div style="background-color: #fff; padding: 20px; border-radius: 6px; margin-bottom: 20px;">
+              <h2 style="color: #333; font-size: 16px; border-bottom: 1px solid #eaeaea; padding-bottom: 10px; margin-top: 0;">Inquiry Details</h2>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px 0; color: #666; width: 120px;"><strong>Type:</strong></td><td style="padding: 8px 0; color: #333; font-weight: bold;">${formData.inquiryType}</td></tr>
+                <tr><td style="padding: 8px 0; color: #666;"><strong>Subject:</strong></td><td style="padding: 8px 0; color: #333;">${formData.subject}</td></tr>
+                ${formData.preferredDate ? `<tr><td style="padding: 8px 0; color: #666;"><strong>Preferred Date:</strong></td><td style="padding: 8px 0; color: #333;">${formData.preferredDate}</td></tr>` : ''}
+                ${formData.preferredTime ? `<tr><td style="padding: 8px 0; color: #666;"><strong>Preferred Time:</strong></td><td style="padding: 8px 0; color: #333;">${formData.preferredTime}</td></tr>` : ''}
+              </table>
+            </div>
+
+            <div style="background-color: #fff; padding: 20px; border-radius: 6px;">
+              <h2 style="color: #333; font-size: 16px; border-bottom: 1px solid #eaeaea; padding-bottom: 10px; margin-top: 0;">Message</h2>
+              <p style="color: #444; line-height: 1.6; white-space: pre-wrap; font-size: 14px; margin: 0;">${formData.message}</p>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px; font-family: sans-serif;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center">
+                    <a href="tel:${formData.phone}" style="background-color: #222; color: ${themeColor}; padding: 12px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin: 0 5px; border: 1px solid ${themeColor};">
+                      <img src="https://img.icons8.com/ios-filled/50/C6A75E/phone.png" width="16" height="16" alt="Call" style="vertical-align: middle; margin-right: 5px;" />
+                      Call
+                    </a>
+                    <a href="https://wa.me/${formData.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi ${formData.name}, I'm reaching out regarding your recent inquiry: ${formData.subject}`)}" style="background-color: #222; color: #25D366; padding: 12px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin: 0 5px; border: 1px solid #25D366;">
+                      <img src="https://img.icons8.com/color/48/whatsapp--v1.png" width="18" height="18" alt="WhatsApp" style="vertical-align: middle; margin-right: 5px;" />
+                      WhatsApp
+                    </a>
+                    <a href="mailto:${formData.email}?subject=Re: ${encodeURIComponent(formData.subject)}" style="background-color: ${themeColor}; color: #111; padding: 12px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin: 0 5px;">
+                      <img src="https://img.icons8.com/ios-filled/50/111111/mail.png" width="16" height="16" alt="Email" style="vertical-align: middle; margin-right: 5px;" />
+                      Email
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        `;
+
+        const templateParams = {
+          to_name: "Admin",
+          from_name: formData.name,
+          reply_to: formData.email,
+          subject: `${formData.inquiryType} - ${formData.subject}`,
+          html_message: htmlMessage,
+        };
+
+        // Connect with correct EmailJS credentials
+        await emailjs.send(
+          "service_1eclz99",
+          "template_5eq44ls",
+          templateParams,
+          "o5qt9JeB9WmVGb79E"
+        );
+      } catch (emailError) {
+        console.error("EmailJS sending failed:", emailError);
+      }
 
       if (res.success) {
         toast.success("Your inquiry has been submitted successfully! We'll get back to you within 24 hours.");

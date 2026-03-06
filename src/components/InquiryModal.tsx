@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
+import emailjs from "@emailjs/browser";
 const inquirySchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
   email: z.string().email("Please enter a valid email"),
@@ -87,12 +88,97 @@ const InquiryModal = ({ isOpen, onClose, product, currency = "CAD" }: InquiryMod
 
     setIsSubmitting(true);
     try {
+      // 1. Send via API
       const res = await api.inquiries.create({
         ...formData,
         product_id: product.id,
         product_name: product.name,
         inquiry_type: 'product'
       });
+
+      // 2. Send via EmailJS directly to customer's inbox / admin
+      try {
+        const themeColor = "#C6A75E";
+        const bgColor = "#FAF9F7";
+
+        const htmlMessage = `
+          <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; background-color: ${bgColor}; border: 1px solid #eee; border-radius: 8px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h1 style="color: ${themeColor}; margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 2px;">New Product Inquiry</h1>
+              <p style="color: #666; font-size: 14px; margin-top: 5px;">You have received a new inquiry from your website.</p>
+            </div>
+            
+            <div style="background-color: #fff; padding: 20px; border-radius: 6px; margin-bottom: 20px;">
+              <h2 style="color: #333; font-size: 16px; border-bottom: 1px solid #eaeaea; padding-bottom: 10px; margin-top: 0;">Customer Details</h2>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px 0; color: #666; width: 120px;"><strong>Name:</strong></td><td style="padding: 8px 0; color: #333;">${formData.name}</td></tr>
+                <tr><td style="padding: 8px 0; color: #666;"><strong>Email:</strong></td><td style="padding: 8px 0; color: #333;"><a href="mailto:${formData.email}" style="color: ${themeColor};">${formData.email}</a></td></tr>
+                <tr><td style="padding: 8px 0; color: #666;"><strong>Phone:</strong></td><td style="padding: 8px 0; color: #333;"><a href="tel:${formData.phone}" style="color: ${themeColor};">${formData.phone}</a></td></tr>
+                <tr><td style="padding: 8px 0; color: #666;"><strong>City/Address:</strong></td><td style="padding: 8px 0; color: #333;">${formData.city || 'N/A'} ${formData.address ? ', ' + formData.address : ''}</td></tr>
+              </table>
+            </div>
+
+            <div style="background-color: #fff; padding: 20px; border-radius: 6px; margin-bottom: 20px;">
+              <h2 style="color: #333; font-size: 16px; border-bottom: 1px solid #eaeaea; padding-bottom: 10px; margin-top: 0;">Product Details</h2>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 8px 0; vertical-align: top; width: 100px;">
+                    <img src="${product.image}" alt="${product.name}" style="width: 80px; height: auto; border-radius: 4px;" />
+                  </td>
+                  <td style="padding: 8px 0; vertical-align: top;">
+                    <p style="margin: 0 0 5px 0; font-weight: bold; color: #333;">${product.name}</p>
+                    <p style="margin: 0 0 5px 0; font-size: 14px; color: #666;">Category: ${product.category}</p>
+                    <p style="margin: 0; font-weight: bold; color: ${themeColor};">${currencySymbol}${displayPrice.toLocaleString()}</p>
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+            <div style="background-color: #fff; padding: 20px; border-radius: 6px;">
+              <h2 style="color: #333; font-size: 16px; border-bottom: 1px solid #eaeaea; padding-bottom: 10px; margin-top: 0;">Message</h2>
+              <p style="color: #444; line-height: 1.6; white-space: pre-wrap; font-size: 14px; margin: 0;">${formData.message}</p>
+            </div>
+            <div style="text-align: center; margin-top: 30px; font-family: sans-serif;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center">
+                    <a href="tel:${formData.phone}" style="background-color: #222; color: ${themeColor}; padding: 12px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin: 0 5px; border: 1px solid ${themeColor};">
+                      <img src="https://img.icons8.com/ios-filled/50/C6A75E/phone.png" width="16" height="16" alt="Call" style="vertical-align: middle; margin-right: 5px;" />
+                      Call
+                    </a>
+                    <a href="https://wa.me/${formData.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi ${formData.name}, I'm reaching out regarding your inquiry for ${product.name}.`)}" style="background-color: #222; color: #25D366; padding: 12px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin: 0 5px; border: 1px solid #25D366;">
+                      <img src="https://img.icons8.com/color/48/whatsapp--v1.png" width="18" height="18" alt="WhatsApp" style="vertical-align: middle; margin-right: 5px;" />
+                      WhatsApp
+                    </a>
+                    <a href="mailto:${formData.email}?subject=Re: Inquiry about ${product.name}" style="background-color: ${themeColor}; color: #111; padding: 12px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin: 0 5px;">
+                      <img src="https://img.icons8.com/ios-filled/50/111111/mail.png" width="16" height="16" alt="Email" style="vertical-align: middle; margin-right: 5px;" />
+                      Email
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        `;
+
+        const templateParams = {
+          to_name: "Admin",
+          from_name: formData.name,
+          reply_to: formData.email,
+          subject: `New Product Inquiry: ${product.name}`,
+          html_message: htmlMessage, // Uses a single parameter for the entire visually rich payload
+        };
+
+        // Connect with correct EmailJS credentials
+        await emailjs.send(
+          "service_1eclz99",
+          "template_5eq44ls",
+          templateParams,
+          "o5qt9JeB9WmVGb79E"
+        );
+      } catch (emailError) {
+        console.error("EmailJS sending failed:", emailError);
+      }
 
       if (res.success) {
         // Save inquiry to history (local storage)
