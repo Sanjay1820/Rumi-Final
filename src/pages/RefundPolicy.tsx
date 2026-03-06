@@ -10,30 +10,30 @@ const RefundPolicy = () => {
       <Header />
       <main className="min-h-screen bg-background">
         {/* Hero */}
-        <section className="pt-32 md:pt-48 pb-12 md:pb-24 bg-secondary/30 relative overflow-hidden">
-          <div className="container mx-auto px-4 text-center">
+        <section className="pt-24 md:pt-32 lg:pt-48 pb-12 md:pb-24 bg-secondary/30 relative overflow-hidden">
+          <div className="container mx-auto px-4 sm:px-6 md:px-8 text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <p className="font-accent text-sm tracking-[0.3em] text-primary mb-4">LEGAL</p>
-              <h1 className="font-display text-4xl md:text-5xl text-foreground uppercase">Refund Policy</h1>
-              <p className="font-body text-muted-foreground mt-4">Last updated: 26th September 2025</p>
+              <p className="font-accent text-xs md:text-sm tracking-[0.3em] text-primary mb-3 md:mb-4">LEGAL</p>
+              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-foreground uppercase break-words">Refund Policy</h1>
+              <p className="font-body text-sm md:text-base text-muted-foreground mt-3 md:mt-4">Last updated: 26th September 2025</p>
             </motion.div>
           </div>
         </section>
 
-        <section className="py-24">
-          <div className="container mx-auto px-4 max-w-4xl">
-            <div className="font-body text-muted-foreground space-y-8 leading-relaxed">
+        <section className="py-12 md:py-16 lg:py-24">
+          <div className="container mx-auto px-4 sm:px-6 md:px-8 max-w-4xl">
+            <div className="font-body text-sm md:text-base text-muted-foreground space-y-6 md:space-y-8 leading-relaxed">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="bg-primary/5 border border-primary/20 p-6 rounded-xl text-foreground text-center"
+                className="bg-primary/5 border border-primary/20 p-4 md:p-6 rounded-xl text-foreground text-center mx-auto"
               >
-                <p className="font-bold text-lg">Important — ALL SALES ARE FINAL.</p>
+                <p className="font-bold text-base md:text-lg">Important — ALL SALES ARE FINAL.</p>
               </motion.div>
 
               <motion.div
@@ -53,8 +53,8 @@ const RefundPolicy = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="font-display text-2xl text-foreground mb-4">1. NO RETURNS, NO EXCHANGES, NO CANCELLATIONS</h2>
-                <ul className="list-disc pl-6 space-y-4">
+                <h2 className="font-display text-xl sm:text-2xl text-foreground mb-3 md:mb-4">1. NO RETURNS, NO EXCHANGES, NO CANCELLATIONS</h2>
+                <ul className="list-disc pl-5 md:pl-6 space-y-3 md:space-y-4">
                   <li>
                     <strong className="text-foreground">All sales are final.</strong> We do not offer returns,
                     exchanges, or order cancellations for change of mind, sizing issues, or buyer’s remorse.
@@ -70,15 +70,15 @@ const RefundPolicy = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="font-display text-2xl text-foreground mb-4">2. DAMAGED OR DEFECTIVE ITEMS (EXCEPTION)</h2>
-                <p className="mb-4">
+                <h2 className="font-display text-xl sm:text-2xl text-foreground mb-3 md:mb-4">2. DAMAGED OR DEFECTIVE ITEMS (EXCEPTION)</h2>
+                <p className="mb-3 md:mb-4">
                   We will only consider replacement or refund for items that are <strong className="text-foreground">damaged or defective on arrival</strong>.
                 </p>
-                <ul className="list-disc pl-6 space-y-4">
+                <ul className="list-disc pl-5 md:pl-6 space-y-3 md:space-y-4">
                   <li>
                     To request review for a damaged/defective item, contact us within 1 day of delivery at
-                    <a href="mailto:hello@rumibymanisha.com" className="text-primary hover:underline ml-1">hello@rumibymanisha.com</a> with:
-                    <ul className="list-circle pl-6 mt-2 space-y-1 text-sm">
+                    <a href="mailto:hello@rumibymanisha.com" className="text-primary hover:underline ml-1 break-all">hello@rumibymanisha.com</a> with:
+                    <ul className="list-circle pl-5 md:pl-6 mt-2 space-y-1 text-sm">
                       <li>Your order number</li>
                       <li>Clear photos showing the damage/defect (include at least one photo of the item as received and one of the packaging)</li>
                       <li>A short description of the issue</li>
@@ -105,11 +105,11 @@ const RefundPolicy = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="font-display text-2xl text-foreground mb-4">3. CANCELLATIONS</h2>
+                <h2 className="font-display text-xl sm:text-2xl text-foreground mb-3 md:mb-4">3. CANCELLATIONS</h2>
                 <p>
                   Because all sales are final, cancellations are not permitted once an order is placed.
                   If you believe your order was placed in error, contact
-                  <a href="mailto:hello@rumibymanisha.com" className="text-foreground font-bold hover:underline mx-1">hello@rumibymanisha.com</a>
+                  <a href="mailto:hello@rumibymanisha.com" className="text-foreground font-bold hover:underline mx-1 break-all">hello@rumibymanisha.com</a>
                   immediately — we may be able to help if the order has not yet been processed, but this is not guaranteed.
                 </p>
               </motion.div>
@@ -119,7 +119,7 @@ const RefundPolicy = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="font-display text-2xl text-foreground mb-4">4. SHIPPING COSTS</h2>
+                <h2 className="font-display text-xl sm:text-2xl text-foreground mb-3 md:mb-4">4. SHIPPING COSTS</h2>
                 <p>
                   Shipping costs for standard orders are non-refundable unless the return is authorized
                   due to our error or an approved damaged/defective claim.
@@ -131,9 +131,9 @@ const RefundPolicy = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="font-display text-2xl text-foreground mb-4">5. HOW TO CONTACT US</h2>
-                <p className="font-bold text-foreground">Rumi By Manisha</p>
-                <p>Email: <a href="mailto:hello@rumibymanisha.com" className="text-primary hover:underline">hello@rumibymanisha.com</a></p>
+                <h2 className="font-display text-xl sm:text-2xl text-foreground mb-3 md:mb-4">5. HOW TO CONTACT US</h2>
+                <p className="font-bold text-foreground mb-1">Rumi By Manisha</p>
+                <p>Email: <a href="mailto:hello@rumibymanisha.com" className="text-primary hover:underline break-all">hello@rumibymanisha.com</a></p>
               </motion.div>
             </div>
           </div>
